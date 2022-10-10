@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: node_modules/.bin/nodemon src/index.ts
+    volumes:
+      - .:/app
+    ports:
+      - 8000:8000
+    environment:
+      DATABASE_URI: mongodb://root:password@mongo:27017/advocate?authSource=admin&replicaSet=rs0
+    depends_on:
+      - mongo
+
+  mongo:
+    image: bitnami/mongodb:4.4
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb-volume:/bitnami/mongodb
+    environment:
+      - MONGODB_REPLICA_SET_MODE=primary
+      - MONGODB_ADVERTISED_HOSTNAME=mongo
+      - MONGODB_REPLICA_SET_KEY=replicasetkey123
+      - MONGODB_REPLICA_SET_NAME=rs0
+      - MONGODB_ROOT_PASSWORD=password
+
+volumes:
+  mongodb-volume:
