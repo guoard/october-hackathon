@@ -1,3 +1,6 @@
+import fs from "fs";
+import Path from "path";
+import Boom from "@hapi/boom";
 import { Schema, model } from "mongoose";
 
 import { ICompanyDocument, ICompanyModel } from "../interfaces/ICompany";
@@ -29,6 +32,18 @@ const CompanySchema: Schema<ICompanyDocument> = new Schema(
     timestamps: true,
   }
 );
+
+CompanySchema.methods.deleteLogo = async function () {
+  if (this.logo) {
+    console.log("deleting logo...");
+    fs.unlink(Path.join(__dirname, "..", "..", "media", this.logo), (err) => {
+      if (err) {
+        throw Boom.internal();
+      }
+      console.log("logo deleted successfully");
+    });
+  }
+};
 
 const Company = model<ICompanyDocument, ICompanyModel>(
   "Company",

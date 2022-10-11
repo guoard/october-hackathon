@@ -1,51 +1,78 @@
-import fs from "fs";
-import Path from "path";
-
-import mime from "mime-types";
-import { v4 as uuidv4 } from "uuid";
+import Boom from "@hapi/boom";
 import { Request, ResponseToolkit } from "@hapi/hapi";
 
 import Company from "../models/companyModel";
+import savePhoto from "../utils/uploadPhoto";
 import companyPayload from "../types/companyPayload";
 
-const handleFileUpload = (
-  file: any,
-  filename: string
-): Promise<void | Error> => {
-  return new Promise((resolve, reject) => {
-    const data = file._data;
-    fs.writeFile(
-      Path.join(__dirname, "..", "..", "media", filename),
-      data,
-      (err) => {
-        if (err) {
-          reject(err);
-        }
-        resolve();
-      }
-    );
-  });
+export const getCompany = async (req: Request, h: ResponseToolkit) => {
+  const { id } = req.params;
+
+  const company = await Company.findById(id);
+  if (!company) {
+    return Boom.notFound("Company does not exists");
+  }
+
+  return h.response(company);
 };
 
-export const getCompany = async (req: Request, h: ResponseToolkit) => {};
-export const listCompanies = async (req: Request, h: ResponseToolkit) => {};
+export const listCompanies = async (_: Request, h: ResponseToolkit) => {
+  const companies = await Company.find().sort({ createdAt: -1 });
+
+  return h.response(companies);
+};
+
 export const createCompany = async (req: Request, h: ResponseToolkit) => {
   const { name, logo, summary } = req.payload as companyPayload;
 
-  //TODO: check mimetype is image
-  let filename = "";
+  let fileName = "";
   if (logo) {
-    const ext = mime.extension(logo.hapi.headers["content-type"]);
-    filename = `${uuidv4()}.${ext}`;
-    await handleFileUpload(logo, filename);
+    fileName = await savePhoto(logo);
   }
 
   const company = await Company.create({
     name,
     summary,
-    logo: filename,
+    logo: fileName,
   });
   return h.response(company).code(201);
 };
-export const updateCompany = async (req: Request, h: ResponseToolkit) => {};
-export const deleteCompany = async (req: Request, h: ResponseToolkit) => {};
+
+export const updateCompany = async (req: Request, h: ResponseToolkit) => {
+  const { id } = req.params;
+  const { name, logo, summary } = req.payload as companyPayload;
+
+  const company = await Company.findById(id);
+  if (!company) {
+    return Boom.notFound("Company does not exists");
+  }
+
+  //TODO: Check if it is same picture
+  company.deleteLogo();
+
+  let fileName = "";
+  if (logo) {
+    fileName = await savePhoto(logo);
+  }
+
+  company.name = name;
+  company.summary = summary;
+  company.logo = fileName;
+  await company.save();
+
+  return h.response(company);
+};
+
+export const deleteCompany = async (req: Request, h: ResponseToolkit) => {
+  const { id } = req.params;
+
+  const company = await Company.findById(id);
+  if (!company) {
+    return Boom.notFound("Company does not exists");
+  }
+
+  company.deleteLogo();
+  await company.delete();
+
+  return h.response().code(204);
+};

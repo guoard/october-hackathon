@@ -36,9 +36,8 @@ const companyRoutes: ServerRoute[] = [
     options: {
       payload: {
         multipart: {
-          output: "stream",
+          output: 'data'
         },
-        maxBytes: 1024 * 1024 * 1, // 1 Mb
       },
       validate: createCompanyValidate,
     },
@@ -48,6 +47,11 @@ const companyRoutes: ServerRoute[] = [
     path: "/companies/{id}",
     handler: updateCompany,
     options: {
+      payload: {
+        multipart: {
+          output: 'data'
+        },
+      },
       validate: updateCompanyValidate,
     },
   },

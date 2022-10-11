@@ -2,13 +2,13 @@ import Joi from "joi";
 import { Request, ResponseToolkit } from "@hapi/hapi";
 
 const CompanyValidation = {
-  name: Joi.string().required().max(100),
-  logo: Joi.any()
+  name: Joi.string().required().min(2).max(100).trim(),
+  logo: Joi.binary()
+    .max(1024 * 1024 * 1)
     .meta({ swaggerType: "file" })
     .optional()
-    .allow("")
     .description("image file"),
-  summary: Joi.string().required().min(10),
+  summary: Joi.string().required().min(10).max(1000).trim(),
 };
 
 const paramWithIdValidation = {

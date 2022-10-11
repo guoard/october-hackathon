@@ -12,7 +12,6 @@
   "devDependencies": {
     "@types/hapi__hapi": "^20.0.12",
     "@types/hapi__inert": "^5.2.3",
-    "@types/mime-types": "^2.1.1",
     "@types/uuid": "^8.3.4",
     "nodemon": "^2.0.20",
     "ts-node": "^10.9.1",
@@ -22,8 +21,8 @@
     "@hapi/boom": "^10.0.0",
     "@hapi/hapi": "^20.2.2",
     "@hapi/inert": "^7.0.0",
+    "file-type": "^16.5.3",
     "joi": "^17.6.2",
-    "mime-types": "^2.1.35",
     "mongoose": "^6.6.5",
     "uuid": "^9.0.0"
   }

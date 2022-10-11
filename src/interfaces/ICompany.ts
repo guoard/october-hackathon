@@ -6,6 +6,8 @@ export interface ICompany {
   summary: string;
 }
 
-export interface ICompanyDocument extends ICompany, Document {}
+export interface ICompanyDocument extends ICompany, Document {
+  deleteLogo: () => void;
+}
 
 export interface ICompanyModel extends Model<ICompanyDocument> {}
