@@ -49,6 +49,7 @@ const AdvocateSchema: Schema<IAdvocateDocument> = new Schema(
   },
   {
     toJSON: {
+      virtuals: true,
       transform: function (_doc, ret) {
         return {
           id: ret._id,
@@ -61,6 +62,7 @@ const AdvocateSchema: Schema<IAdvocateDocument> = new Schema(
           advocate_years_exp: ret.advocate_years_exp,
           company: ret.company,
           links: ret.links,
+          href: typeof ret.advocate_years_exp === 'number' ? undefined : ret.href,
         };
       },
     },
@@ -68,8 +70,12 @@ const AdvocateSchema: Schema<IAdvocateDocument> = new Schema(
   }
 );
 
-AdvocateSchema.pre("find", function () {
-  this.populate({ path: "company", select: "id name logo" });
+AdvocateSchema.virtual("href").get(function () {
+  return `/advocates/${this._id}`;
+});
+
+AdvocateSchema.pre(/^find/, function () {
+  this.populate({ path: "company", select: "id name logo -advocates" });
 });
 
 AdvocateSchema.methods.deleteProfilePic = async function () {

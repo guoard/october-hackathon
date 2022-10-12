@@ -5,6 +5,7 @@ import advocatePayload from "../types/advocatePayload";
 import savePhoto from "../utils/uploadPhoto";
 import Company from "../models/companyModel";
 import Advocate from "../models/advocateModel";
+import runInTransaction from "../utils/runInTransaction";
 
 export const getAdvocate = async (req: Request, h: ResponseToolkit) => {
   const { id } = req.params;
@@ -34,36 +35,59 @@ export const createAdvocate = async (req: Request, h: ResponseToolkit) => {
     links,
   } = req.payload as advocatePayload;
 
-  if (company) {
-    const thisCompany = await Company.findById(company);
-    if (!thisCompany) {
-      return Boom.notFound("Company does not exists");
+  const createdAdvocate = await runInTransaction(async (session) => {
+    let thisCompany: any;
+
+    if (company) {
+      thisCompany = await Company.findById(company);
+      if (!thisCompany) {
+        return false;
+      }
     }
-  }
 
-  let fileName: string | null = null;
-  if (profile_pic) {
-    fileName = await savePhoto(profile_pic);
-  }
+    let fileName: string | null = null;
+    if (profile_pic) {
+      fileName = await savePhoto(profile_pic);
+    }
 
-  const advocate = await Advocate.create({
-    name,
-    profile_pic: fileName,
-    short_bio,
-    long_bio,
-    advocate_years_exp,
-    company,
-    links,
+    const advocate = await Advocate.create(
+      [
+        {
+          name,
+          profile_pic: fileName,
+          short_bio,
+          long_bio,
+          advocate_years_exp,
+          company,
+          links,
+        },
+      ],
+      { session }
+    );
+
+    if (thisCompany) {
+      thisCompany.advocates.push(advocate[0]._id);
+    }
+
+    await thisCompany.save({ session });
+
+    return advocate[0];
   });
 
-  const populatedAdvocate = await advocate.populate({
+  if (!createdAdvocate) {
+    return Boom.notFound("Company does not exists");
+  }
+
+  const populatedAdvocate = await createdAdvocate.populate({
     path: "company",
-    select: "id name logo",
+    select: "id name logo -advocates",
   });
 
   return h.response(populatedAdvocate).code(201);
 };
 
+//TODO: check populate updated advocate
+//TODO: use transaction to update advocate
 export const updateAdvocate = async (req: Request, h: ResponseToolkit) => {
   const { id } = req.params;
   const {
@@ -111,7 +135,7 @@ export const updateAdvocate = async (req: Request, h: ResponseToolkit) => {
 
   return h.response(populatedAdvocate);
 };
-
+//TODO: remove advocate from associated company
 export const deleteAdvocate = async (req: Request, h: ResponseToolkit) => {
   const { id } = req.params;
 

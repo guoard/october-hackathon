@@ -18,22 +18,39 @@ const CompanySchema: Schema<ICompanyDocument> = new Schema(
     summary: {
       type: String,
     },
+    advocates: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Advocate", 
+      }
+    ]
   },
   {
     toJSON: {
+      virtuals: true,
       transform: function (_doc, ret) {
+        console.log(ret)
         return {
           id: ret._id,
           name: ret.name,
           logo: ret.logo ? `/media/${ret.logo}` : ret.logo,
           summary: ret.summary,
-          href: ret.summary ? undefined : `/companies/${ret._id}`,
+          advocates: ret.advocates,
+          href: ret.summary ? undefined : ret.href,
         };
       },
     },
     timestamps: true,
   }
 );
+
+CompanySchema.virtual("href").get(function () {
+  return `/companies/${this._id}`;
+});
+
+CompanySchema.pre(/^find/, function () {
+  this.populate({ path: "advocates", select: "id name short_bio -company" });
+});
 
 CompanySchema.methods.deleteLogo = async function () {
   if (this.logo) {
