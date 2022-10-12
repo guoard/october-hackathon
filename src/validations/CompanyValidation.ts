@@ -1,13 +1,16 @@
 import Joi from "joi";
-import { Request, ResponseToolkit } from "@hapi/hapi";
+
+import failAction from "../utils/failAction";
 
 const CompanyValidation = {
-  name: Joi.string().required().min(2).max(100).trim(),
+  name: Joi.string().required().min(2).max(50).trim(),
   logo: Joi.binary()
     .max(1024 * 1024 * 1)
     .meta({ swaggerType: "file" })
     .optional()
-    .description("image file"),
+    .description("image file")
+    .allow(null)
+    .default(null),
   summary: Joi.string().required().min(10).max(1000).trim(),
 };
 
@@ -16,10 +19,6 @@ const paramWithIdValidation = {
     .regex(new RegExp("^[0-9a-fA-F]{24}$"))
     .required()
     .messages({ "string.pattern.base": "Invalid id" }),
-};
-
-const failAction = (_request: Request, _h: ResponseToolkit, err: any) => {
-  throw err;
 };
 
 export const createCompanyValidate = {

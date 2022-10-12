@@ -5,6 +5,7 @@ import Hapi from "@hapi/hapi";
 import Inert from "@hapi/inert";
 
 import companyRoutes from "../routes/CompanyRoutes";
+import advocateRoutes from "../routes/AdvocateRoutes";
 
 const server = Hapi.server({
   port: 8000 || process.env.PORT,
@@ -20,18 +21,19 @@ const server = Hapi.server({
 const initServer = async () => {
   await server.register(Inert);
   server.route({
-    method: 'GET',
-    path: '/media/{param*}',
+    method: "GET",
+    path: "/media/{param*}",
     handler: {
-        directory: {
-            path: Path.join(__dirname, "..", "..", "media"),
-        }
-    }
+      directory: {
+        path: Path.join(__dirname, "..", "..", "media"),
+      },
+    },
   });
 
   server.validator(Joi);
 
   server.route(companyRoutes);
+  server.route(advocateRoutes);
 
   await server.start();
   console.log(`Server running on ${server.info.uri}`);

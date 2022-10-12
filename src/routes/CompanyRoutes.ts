@@ -36,7 +36,7 @@ const companyRoutes: ServerRoute[] = [
     options: {
       payload: {
         multipart: {
-          output: 'data'
+          output: "data",
         },
       },
       validate: createCompanyValidate,
@@ -49,7 +49,7 @@ const companyRoutes: ServerRoute[] = [
     options: {
       payload: {
         multipart: {
-          output: 'data'
+          output: "data",
         },
       },
       validate: updateCompanyValidate,

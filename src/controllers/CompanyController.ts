@@ -4,6 +4,7 @@ import { Request, ResponseToolkit } from "@hapi/hapi";
 import Company from "../models/companyModel";
 import savePhoto from "../utils/uploadPhoto";
 import companyPayload from "../types/companyPayload";
+import Advocate from "../models/advocateModel";
 
 export const getCompany = async (req: Request, h: ResponseToolkit) => {
   const { id } = req.params;
@@ -25,7 +26,7 @@ export const listCompanies = async (_: Request, h: ResponseToolkit) => {
 export const createCompany = async (req: Request, h: ResponseToolkit) => {
   const { name, logo, summary } = req.payload as companyPayload;
 
-  let fileName = "";
+  let fileName: string | null = null;
   if (logo) {
     fileName = await savePhoto(logo);
   }
@@ -50,7 +51,7 @@ export const updateCompany = async (req: Request, h: ResponseToolkit) => {
   //TODO: Check if it is same picture
   company.deleteLogo();
 
-  let fileName = "";
+  let fileName: string | null = null;
   if (logo) {
     fileName = await savePhoto(logo);
   }
@@ -69,6 +70,13 @@ export const deleteCompany = async (req: Request, h: ResponseToolkit) => {
   const company = await Company.findById(id);
   if (!company) {
     return Boom.notFound("Company does not exists");
+  }
+
+  const advocateCount = await Advocate.countDocuments({ company: id });
+  if (advocateCount > 0) {
+    return Boom.badRequest(
+      "Can not delete company, because it associated with advocates."
+    );
   }
 
   company.deleteLogo();

@@ -13,6 +13,7 @@ const CompanySchema: Schema<ICompanyDocument> = new Schema(
     },
     logo: {
       type: String,
+      default: null,
     },
     summary: {
       type: String,
@@ -26,6 +27,7 @@ const CompanySchema: Schema<ICompanyDocument> = new Schema(
           name: ret.name,
           logo: ret.logo ? `/media/${ret.logo}` : ret.logo,
           summary: ret.summary,
+          href: ret.summary ? undefined : `/companies/${ret._id}`,
         };
       },
     },
