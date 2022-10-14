@@ -29,7 +29,6 @@ const CompanySchema: Schema<ICompanyDocument> = new Schema(
     toJSON: {
       virtuals: true,
       transform: function (_doc, ret) {
-        console.log(ret)
         return {
           id: ret._id,
           name: ret.name,
