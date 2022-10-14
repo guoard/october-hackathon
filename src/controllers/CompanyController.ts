@@ -3,8 +3,9 @@ import { Request, ResponseToolkit } from "@hapi/hapi";
 
 import Company from "../models/companyModel";
 import savePhoto from "../utils/uploadPhoto";
-import companyPayload from "../types/companyPayload";
 import Advocate from "../models/advocateModel";
+import APIFeatures from "../utils/apiFeatures";
+import companyPayload from "../types/companyPayload";
 
 export const getCompany = async (req: Request, h: ResponseToolkit) => {
   const { id } = req.params;
@@ -17,8 +18,13 @@ export const getCompany = async (req: Request, h: ResponseToolkit) => {
   return h.response(company);
 };
 
-export const listCompanies = async (_: Request, h: ResponseToolkit) => {
-  const companies = await Company.find().sort({ createdAt: -1 });
+export const listCompanies = async (req: Request, h: ResponseToolkit) => {
+  const features = new APIFeatures(Company.find(), req.query)
+    .filter()
+    .sort()
+    .paginate();
+
+  const companies = await features.query;
 
   return h.response(companies);
 };
@@ -38,7 +44,6 @@ export const createCompany = async (req: Request, h: ResponseToolkit) => {
   });
   return h.response(company).code(201);
 };
-
 
 export const updateCompany = async (req: Request, h: ResponseToolkit) => {
   const { id } = req.params;

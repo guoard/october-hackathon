@@ -9,6 +9,7 @@ import {
 } from "../controllers/CompanyController";
 
 import {
+  getAllCompanies,
   getCompanyValidate,
   createCompanyValidate,
   updateCompanyValidate,
@@ -20,6 +21,9 @@ const companyRoutes: ServerRoute[] = [
     method: "GET",
     path: "/companies",
     handler: listCompanies,
+    options: {
+      validate: getAllCompanies,
+    },
   },
   {
     method: "GET",

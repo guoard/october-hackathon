@@ -41,3 +41,12 @@ export const getCompanyValidate = {
   params: paramWithIdValidation,
   failAction,
 };
+
+export const getAllCompanies = {
+  query: Joi.object({
+    query: Joi.string().min(1).max(50).trim(),
+    limit: Joi.number().integer().min(1),
+    page: Joi.number().integer().min(1),
+  }),
+  failAction,
+};

@@ -9,6 +9,7 @@ import {
 } from "../controllers/AdvocateController";
 
 import {
+  getAllAdvocates,
   getAdvocateValidate,
   createAdvocateValidate,
   updateAdvocateValidate,
@@ -20,6 +21,9 @@ const advocateRoutes: ServerRoute[] = [
     method: "GET",
     path: "/advocates",
     handler: listAdvocates,
+    options: {
+      validate: getAllAdvocates,
+    },
   },
   {
     method: "GET",

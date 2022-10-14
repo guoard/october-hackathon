@@ -1,10 +1,11 @@
 import Boom from "@hapi/boom";
 import { Request, ResponseToolkit } from "@hapi/hapi";
-import advocatePayload from "../types/advocatePayload";
 
 import savePhoto from "../utils/uploadPhoto";
 import Company from "../models/companyModel";
+import APIFeatures from "../utils/apiFeatures";
 import Advocate from "../models/advocateModel";
+import advocatePayload from "../types/advocatePayload";
 import runInTransaction from "../utils/runInTransaction";
 
 export const getAdvocate = async (req: Request, h: ResponseToolkit) => {
@@ -18,8 +19,13 @@ export const getAdvocate = async (req: Request, h: ResponseToolkit) => {
   return h.response(advocate);
 };
 
-export const listAdvocates = async (_: Request, h: ResponseToolkit) => {
-  const advocates = await Advocate.find().sort({ createdAt: -1 });
+export const listAdvocates = async (req: Request, h: ResponseToolkit) => {
+  const features = new APIFeatures(Advocate.find(), req.query)
+    .filter()
+    .sort()
+    .paginate();
+
+  const advocates = await features.query;
 
   return h.response(advocates);
 };
