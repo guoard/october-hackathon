@@ -39,7 +39,7 @@ export const createCompany = async (req: Request, h: ResponseToolkit) => {
   return h.response(company).code(201);
 };
 
-//TODO: check populate updated company
+
 export const updateCompany = async (req: Request, h: ResponseToolkit) => {
   const { id } = req.params;
   const { name, logo, summary } = req.payload as companyPayload;

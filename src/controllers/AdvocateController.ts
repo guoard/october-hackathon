@@ -41,7 +41,7 @@ export const createAdvocate = async (req: Request, h: ResponseToolkit) => {
     if (company) {
       thisCompany = await Company.findById(company);
       if (!thisCompany) {
-        throw Boom.badRequest("Company does not exists");
+        throw Boom.notFound("Company does not exists");
       }
     }
 
@@ -104,7 +104,7 @@ export const updateAdvocate = async (req: Request, h: ResponseToolkit) => {
     if (company) {
       thisCompany = await Company.findById(company);
       if (!thisCompany) {
-        throw Boom.badRequest("Company does not exists");
+        throw Boom.notFound("Company does not exists");
       }
     }
 
