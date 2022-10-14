@@ -1,0 +1,11 @@
+{
+  "app": "hackathon",
+  "platform": "docker",
+  "port": 8000,
+  "disks": [
+    {
+      "name": "media",
+      "mountTo": "/opt/app/media"
+    }
+  ]
+}
