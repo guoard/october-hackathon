@@ -16,7 +16,7 @@ services:
       - mongo
 
   mongo:
-    image: bitnami/mongodb:4.4
+    image: bitnami/mongodb:5.0
     ports:
       - 27017:27017
     volumes:
