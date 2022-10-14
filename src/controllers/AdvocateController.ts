@@ -18,7 +18,7 @@ export const getAdvocate = async (req: Request, h: ResponseToolkit) => {
   return h.response(advocate);
 };
 
-export const listAdvocates = async (req: Request, h: ResponseToolkit) => {
+export const listAdvocates = async (_: Request, h: ResponseToolkit) => {
   const advocates = await Advocate.find().sort({ createdAt: -1 });
 
   return h.response(advocates);
