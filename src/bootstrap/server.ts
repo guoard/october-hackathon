@@ -20,6 +20,18 @@ const server = Hapi.server({
 
 const initServer = async () => {
   await server.register(Inert);
+
+  server.events.on("response", function (request) {
+    const ip = request.headers.http_x_forwarded_for
+      ? request.headers.http_x_forwarded_for
+      : request.info.remoteAddress;
+    console.log(
+      `${ip}: ${request.method.toUpperCase()} ${request.path} --> ${
+        "statusCode" in request.response ? request.response.statusCode : ""
+      }`
+    );
+  });
+
   server.route([
     {
       method: "GET",
